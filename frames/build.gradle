@@ -4,8 +4,8 @@ apply plugin: 'kotlin-parcelize'
 apply plugin: 'com.google.devtools.ksp'
 
 android {
-    compileSdkVersion Versions.targetSdk
-    buildToolsVersion Versions.buildTools
+    compileSdkVersion FramesVersions.targetSdk
+    buildToolsVersion FramesVersions.buildTools
 
     lint {
         abortOnError false
@@ -21,28 +21,26 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion Versions.minSdk
-        targetSdkVersion Versions.targetSdk
-        versionCode Kuper.version
-        versionName Kuper.versionName
+        minSdkVersion FramesVersions.minSdk
+        targetSdkVersion FramesVersions.targetSdk
+        versionCode Frames.version
+        versionName Frames.versionName
         vectorDrawables.useSupportLibrary true
+        multiDexEnabled true
         proguardFiles 'proguard-android-optimize.txt', 'proguard-rules.pro'
         consumerProguardFiles 'proguard-android-optimize.txt', 'proguard-rules.pro'
 
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments = [
-                        "room.schemaLocation"  : "$projectDir/schemas".toString(),
-                        "room.incremental"     : "true",
-                        "room.expandProjection": "true"]
-            }
+        ksp {
+            arg("room.schemaLocation", "$projectDir/schemas")
+            arg("room.incremental", "true")
+            arg("room.expandProjection", "true")
         }
     }
 
     buildTypes {
         buildTypes.each {
-            it.buildConfigField("String", "DASHBOARD_NAME", "\"Kuper\"")
-            it.buildConfigField("String", "DASHBOARD_VERSION", "\"$Kuper.versionName\"")
+            it.buildConfigField("String", "DASHBOARD_NAME", "\"Frames\"")
+            it.buildConfigField("String", "DASHBOARD_VERSION", "\"$Frames.versionName\"")
         }
         release {
             minifyEnabled false
@@ -78,20 +76,15 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-//    api(Libs.frames) {
-//        transitive = true
-//    }
-    api(project(':frames')) {
-        transitive = true
-    }
-    api Libs.dependencies
+    api FramesLibs.dependencies
+    ksp FramesLibs.kspDependencies
 }
 
 ext {
     PUBLISH_GROUP_ID = 'dev.jahir'
-    PUBLISH_VERSION = Kuper.versionName
-    PUBLISH_ARTIFACT_ID = 'Kuper'
+    PUBLISH_VERSION = Frames.versionName
+    PUBLISH_ARTIFACT_ID = 'Frames'
 }
 
 apply from: '../lib-artifacts.gradle'
-apply from: "${rootProject.projectDir}/scripts/publish-mavencentral.gradle"
+//apply from: "${rootProject.projectDir}/scripts/publish-mavencentral.gradle"
